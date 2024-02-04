@@ -12,6 +12,10 @@ include(":playback:jellyfin")
 include(":playback:ui")
 include(":preference")
 
+include(":sdk")
+project(":sdk").projectDir = file("../jellyfin-sdk-kotlin")
+project(":sdk").buildFileName = "build.gradle"
+
 pluginManagement {
 	repositories {
 		gradlePluginPortal()
@@ -22,6 +26,19 @@ pluginManagement {
 
 dependencyResolutionManagement {
 	repositories {
+
+
+//		var ALIYUN_REPOSITORY_URL = "https://maven.aliyun.com/repository/public"
+//		var ALIYUN_JCENTER_URL = "https://maven.aliyun.com/repository/public"
+//		val ALIYUN_GOOGLE_URL = "https://maven.aliyun.com/repository/google"
+//		val ALIYUN_GRADLE_PLUGIN_URL = "https://maven.aliyun.com/repository/gradle-plugin"
+//
+//		maven (ALIYUN_REPOSITORY_URL)
+//		maven (ALIYUN_JCENTER_URL)
+//		maven (ALIYUN_GOOGLE_URL)
+//		maven (ALIYUN_GRADLE_PLUGIN_URL)
+
+
 		mavenCentral()
 		google()
 
@@ -39,11 +56,13 @@ dependencyResolutionManagement {
 		}
 
 		// Jellyfin apiclient
-		maven("https://jitpack.io") {
-			content {
-				// Only allow legacy apiclient
-				includeVersionByRegex("com.github.jellyfin.jellyfin-sdk-kotlin", ".*", "v0.7.10")
-			}
-		}
+//		maven("https://jitpack.io") {
+//			content {
+//				// Only allow legacy apiclient
+//				includeVersionByRegex("com.github.jellyfin.jellyfin-sdk-kotlin", ".*", "v0.7.10")
+//			}
+//		}
+
+
 	}
 }

@@ -50,7 +50,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 [libraries]
 # Jellyfin
-jellyfin-apiclient = { module = "com.github.jellyfin.jellyfin-sdk-kotlin:android", version.ref = "jellyfin-apiclient" }
+jellyfin-apiclient = { module = "sdk:android", version.ref = "jellyfin-apiclient" }
 jellyfin-sdk = { module = "org.jellyfin.sdk:jellyfin-core", version.ref = "jellyfin-sdk" }
 
 # Kotlin

@@ -1092,6 +1092,7 @@ public class ItemRowAdapter extends MutableObjectAdapter<Object> {
 
     private void retrieve(final LiveTvChannelQuery query) {
         final ItemRowAdapter adapter = this;
+        query.setLimit(3000);
         apiClient.getValue().GetLiveTvChannelsAsync(query, new Response<ChannelInfoDtoResult>() {
             @Override
             public void onResponse(ChannelInfoDtoResult response) {
