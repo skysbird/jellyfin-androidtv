@@ -1093,19 +1093,34 @@ public class ItemRowAdapter extends MutableObjectAdapter<Object> {
     private void retrieve(final LiveTvChannelQuery query) {
         final ItemRowAdapter adapter = this;
         query.setLimit(3000);
+        final LiveTvChannelQuery query1 = query;
         apiClient.getValue().GetLiveTvChannelsAsync(query, new Response<ChannelInfoDtoResult>() {
             @Override
             public void onResponse(ChannelInfoDtoResult response) {
                 if (response.getItems() != null && response.getItems().length > 0) {
+                    int total = 0;
                     int i = itemsLoaded;
+
                     if (i == 0 && adapter.size() > 0) {
                         adapter.clear();
                     }
+
                     for (ChannelInfoDto item : response.getItems()) {
-                        adapter.add(new BaseRowItem(i, item));
-                        i++;
+                        if (!query.getChannelGroup().equals("未分类")) {
+                            if (query.getChannelGroup().equals(item.getChannelGroup())) {
+                                adapter.add(new BaseRowItem(i, item));
+                                i++;
+                                total++;
+                            }
+                        } else {
+                            if (item.getChannelGroup()==null) {
+                                adapter.add(new BaseRowItem(i, item));
+                                i++;
+                                total++;
+                            }
+                        }
                     }
-                    totalItems = response.getTotalRecordCount();
+                    totalItems = total;
                     setItemsLoaded(i);
                     if (i == 0) {
                         removeRow();

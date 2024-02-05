@@ -12,9 +12,9 @@ include(":playback:jellyfin")
 include(":playback:ui")
 include(":preference")
 
-include(":sdk")
-project(":sdk").projectDir = file("../jellyfin-sdk-kotlin")
-project(":sdk").buildFileName = "build.gradle"
+//include(":sdk")
+//project(":sdk").projectDir = file("../jellyfin-sdk-kotlin")
+//project(":sdk").buildFileName = "build.gradle"
 
 pluginManagement {
 	repositories {
@@ -63,6 +63,13 @@ dependencyResolutionManagement {
 //			}
 //		}
 
+		//Jellyfin apiclient
+		mavenLocal {
+			content {
+				// Only allow legacy apiclient
+				includeVersionByRegex("org.jellyfin.apiclient", ".*", "0.7.10")
+			}
+		}
 
 	}
 }

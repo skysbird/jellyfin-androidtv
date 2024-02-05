@@ -7,6 +7,8 @@ import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.Row;
 
+import com.google.common.collect.Sets;
+
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.auth.repository.UserRepository;
 import org.jellyfin.androidtv.constant.ChangeTriggerType;
@@ -15,6 +17,7 @@ import org.jellyfin.androidtv.constant.QueryType;
 import org.jellyfin.androidtv.data.querying.StdItemQuery;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.ui.GridButton;
+import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem;
 import org.jellyfin.androidtv.ui.itemhandling.ItemRowAdapter;
 import org.jellyfin.androidtv.ui.presentation.GridButtonPresenter;
 import org.jellyfin.androidtv.ui.presentation.MutableObjectAdapter;
@@ -22,10 +25,12 @@ import org.jellyfin.androidtv.util.TimeUtils;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.apiclient.LifecycleAwareResponse;
 import org.jellyfin.apiclient.interaction.ApiClient;
+import org.jellyfin.apiclient.interaction.Response;
 import org.jellyfin.apiclient.model.dto.BaseItemDto;
 import org.jellyfin.apiclient.model.dto.BaseItemType;
 import org.jellyfin.apiclient.model.entities.LocationType;
 import org.jellyfin.apiclient.model.entities.SortOrder;
+import org.jellyfin.apiclient.model.livetv.ChannelInfoDto;
 import org.jellyfin.apiclient.model.livetv.LiveTvChannelQuery;
 import org.jellyfin.apiclient.model.livetv.RecommendedProgramQuery;
 import org.jellyfin.apiclient.model.livetv.RecordingQuery;
@@ -38,6 +43,7 @@ import org.jellyfin.apiclient.model.querying.ItemQuery;
 import org.jellyfin.apiclient.model.querying.ItemsResult;
 import org.jellyfin.apiclient.model.querying.LatestItemsQuery;
 import org.jellyfin.apiclient.model.querying.NextUpQuery;
+import org.jellyfin.apiclient.model.results.ChannelInfoDtoResult;
 import org.jellyfin.apiclient.model.results.TimerInfoDtoResult;
 import org.jellyfin.sdk.model.constant.CollectionType;
 import org.jellyfin.sdk.model.constant.ItemSortBy;
@@ -45,10 +51,12 @@ import org.koin.java.KoinJavaComponent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import kotlin.Lazy;
 import timber.log.Timber;
+
 
 public class BrowseViewFragment extends EnhancedBrowseFragment {
     private boolean isLiveTvLibrary;
@@ -312,11 +320,41 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
                 favTv.setIsFavorite(true);
                 mRows.add(new BrowseRowDef(getString(R.string.lbl_favorite_channels), favTv));
 
-                //Other Channels
                 LiveTvChannelQuery otherTv = new LiveTvChannelQuery();
                 otherTv.setUserId(KoinJavaComponent.<UserRepository>get(UserRepository.class).getCurrentUser().getValue().getId().toString());
                 otherTv.setIsFavorite(false);
-                mRows.add(new BrowseRowDef(getString(R.string.lbl_other_channels), otherTv));
+
+
+
+                apiClient.getValue().GetLiveTvChannelsAsync(otherTv, new LifecycleAwareResponse<ChannelInfoDtoResult>(getLifecycle()) {
+                            @Override
+                            public void onResponse(ChannelInfoDtoResult response) {
+                                //if (!getActive()) return;
+                                if (response.getItems() != null) {
+                                    Set<String> groupNameSet = Sets.newTreeSet();
+                                    for (ChannelInfoDto item : response.getItems()) {
+                                        if (item.getChannelGroup()!=null)
+                                            groupNameSet.add(item.getChannelGroup());
+                                    }
+
+                                    groupNameSet.add("未分类");
+                                    for(String groupName : groupNameSet){
+                                        LiveTvChannelQuery otherTv = new LiveTvChannelQuery();
+                                        otherTv.setUserId(KoinJavaComponent.<UserRepository>get(UserRepository.class).getCurrentUser().getValue().getId().toString());
+                                        otherTv.setIsFavorite(false);
+                                        otherTv.setChannelGroup(groupName);
+                                        mRows.add(new BrowseRowDef(groupName, otherTv));
+                                    }
+                                }
+                            }
+                        }
+                );
+
+                        //Other Channels
+//                LiveTvChannelQuery otherTv = new LiveTvChannelQuery();
+//                otherTv.setUserId(KoinJavaComponent.<UserRepository>get(UserRepository.class).getCurrentUser().getValue().getId().toString());
+//                otherTv.setIsFavorite(false);
+//                mRows.add(new BrowseRowDef(getString(R.string.lbl_other_channels), otherTv));
 
                 //Latest Recordings
                 RecordingQuery recordings = new RecordingQuery();
