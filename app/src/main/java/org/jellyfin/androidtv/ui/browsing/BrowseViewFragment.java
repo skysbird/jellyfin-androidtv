@@ -326,10 +326,9 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
 
 
 
-                apiClient.getValue().GetLiveTvChannelsAsync(otherTv, new LifecycleAwareResponse<ChannelInfoDtoResult>(getLifecycle()) {
+                apiClient.getValue().GetLiveTvChannelsAsync(otherTv, new Response<ChannelInfoDtoResult>() {
                             @Override
                             public void onResponse(ChannelInfoDtoResult response) {
-                                //if (!getActive()) return;
                                 if (response.getItems() != null) {
                                     Set<String> groupNameSet = Sets.newTreeSet();
                                     for (ChannelInfoDto item : response.getItems()) {
@@ -344,6 +343,7 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
                                         otherTv.setIsFavorite(false);
                                         otherTv.setChannelGroup(groupName);
                                         mRows.add(new BrowseRowDef(groupName, otherTv));
+                                        rowLoader.loadRows(mRows);
                                     }
                                 }
                             }

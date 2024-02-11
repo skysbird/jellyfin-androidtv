@@ -9,7 +9,15 @@ plugins {
 apply("baselineWorkaround.gradle")
 
 android {
-	namespace = "org.jellyfin.androidtv"
+	signingConfigs {
+        create("release") {
+            storeFile = file("/Users/skysbird/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+    namespace = "org.jellyfin.androidtv"
 	compileSdk = 34
 
 	defaultConfig {
@@ -50,6 +58,8 @@ android {
 			resValue("string", "app_name", "@string/app_name_release")
 
 			buildConfigField("boolean", "DEVELOPMENT", "false")
+			signingConfig = signingConfigs.getByName("release")
+
 		}
 
 		val debug by getting {
